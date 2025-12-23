@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ElevatorUseCase(val scope: CoroutineScope) {
-    val elevatorCount = 4
-    val levels = 10
+class ElevatorUseCase(
+    val scope: CoroutineScope, val noOfElevators: Int, val noOfFloors: Int
+) {
     val currentLevelOfUser = 0
     private val _buttons = MutableStateFlow<List<List<Int>>>(emptyList())
     val buttons = _buttons.asStateFlow()
@@ -25,7 +25,7 @@ class ElevatorUseCase(val scope: CoroutineScope) {
     }
 
     private fun createElevators() {
-        repeat(elevatorCount) { index ->
+        repeat(noOfElevators) { index ->
             val displayName = ('A' + index).toString()
             _elevators.value += Elevator(id = index + 1, displayName = displayName)
         }
@@ -34,11 +34,14 @@ class ElevatorUseCase(val scope: CoroutineScope) {
     private fun createButtons() {
         var index = 1
         val buttonsColumn = mutableListOf<List<Int>>()
-        repeat(3) {
+
+        while (index <= noOfFloors) {
             val buttonsRow = mutableListOf<Int>()
             repeat(3) {
-                buttonsRow.add(index)
-                index++
+                if (index <= noOfFloors) {
+                    buttonsRow.add(index)
+                    index++
+                }
             }
             buttonsColumn.add(buttonsRow)
         }

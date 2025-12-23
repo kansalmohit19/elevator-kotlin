@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 fun main() = runBlocking {
     println("Hello and welcome!")
 
-    val elevatorUseCase = ElevatorUseCase(this)
+    val elevatorUseCase = ElevatorUseCase(this, 4, 9)
     checkForInput(this, elevatorUseCase)
 }
 
