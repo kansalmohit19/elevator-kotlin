@@ -17,6 +17,9 @@ class ElevatorUseCase(
     private val _elevators = MutableStateFlow<List<Elevator>>(emptyList())
     val elevators = _elevators.asStateFlow()
 
+    private val _queue = MutableStateFlow<ArrayDeque<Int>>(ArrayDeque())
+    val queue = _queue.asStateFlow()
+
     init {
         createElevators()
         createButtons()
@@ -74,6 +77,8 @@ class ElevatorUseCase(
                     assignElevator(whereToGo, it)
                 }
             }
+        } ?: run {
+            _queue.value.add(whereToGo)
         }
     }
 
@@ -90,11 +95,7 @@ class ElevatorUseCase(
                 }
                 delay(1000)
             }
-            _elevators.value = _elevators.value.map {
-                if (it.id == elevator.id) it.copy(
-                    state = ElevatorState.IDLE
-                ) else it
-            }
+            makeElevatorIdle(elevator.id)
         }
     }
 
@@ -113,11 +114,24 @@ class ElevatorUseCase(
                 }
                 delay(1000)
             }
-            _elevators.value = _elevators.value.map {
-                if (it.id == elevator.id) it.copy(
-                    state = ElevatorState.IDLE
-                ) else it
-            }
+            //makeElevatorIdle(elevator.id)
+        }
+    }
+
+    private fun makeElevatorIdle(id: Int) {
+        _elevators.value = _elevators.value.map {
+            if (it.id == id) it.copy(
+                state = ElevatorState.IDLE
+            ) else it
+        }
+
+        checkForQueue()
+    }
+
+    private fun checkForQueue() {
+        if (_queue.value.isNotEmpty()) {
+            val element = _queue.value.removeFirst()
+            handleInput(element)
         }
     }
 }
