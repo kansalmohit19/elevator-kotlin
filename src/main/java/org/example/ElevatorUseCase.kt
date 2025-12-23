@@ -11,15 +11,38 @@ class ElevatorUseCase(val scope: CoroutineScope) {
     val elevatorCount = 4
     val levels = 10
     val currentLevelOfUser = 0
+    private val _buttons = MutableStateFlow<List<List<Int>>>(emptyList())
+    val buttons = _buttons.asStateFlow()
+
     private val _elevators = MutableStateFlow<List<Elevator>>(emptyList())
     val elevators = _elevators.asStateFlow()
 
     init {
-        repeat(elevatorCount) { index ->
-            _elevators.value += Elevator(id = index + 1, displayName = "A")
-        }
+        createElevators()
+        createButtons()
 
         printElevatorState()
+    }
+
+    private fun createElevators() {
+        repeat(elevatorCount) { index ->
+            val displayName = ('A' + index).toString()
+            _elevators.value += Elevator(id = index + 1, displayName = displayName)
+        }
+    }
+
+    private fun createButtons() {
+        var index = 1
+        val buttonsColumn = mutableListOf<List<Int>>()
+        repeat(3) {
+            val buttonsRow = mutableListOf<Int>()
+            repeat(3) {
+                buttonsRow.add(index)
+                index++
+            }
+            buttonsColumn.add(buttonsRow)
+        }
+        _buttons.value = buttonsColumn
     }
 
     private fun printElevatorState() {
