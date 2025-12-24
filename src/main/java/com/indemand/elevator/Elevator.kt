@@ -1,4 +1,4 @@
-package org.example
+package com.indemand.elevator
 
 enum class ElevatorState(val displayText: String) {
     MOVING("Moving"), IDLE("Idle")
